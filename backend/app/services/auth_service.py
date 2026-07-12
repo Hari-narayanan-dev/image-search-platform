@@ -1,9 +1,10 @@
+from app.schemas.auth import Token
 from sqlalchemy.orm import Session
-
-from app.config.security import hash_password
+from app.config.security import hash_password, create_access_token, verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate
-from app.exceptions.auth import EmailAlreadyExistsError
+from app.exceptions.auth import EmailAlreadyExistsError,InvalidCredentialsError
+
 
 
 class AuthService:
@@ -38,3 +39,36 @@ class AuthService:
         db.refresh(db_user)
 
         return db_user
+    
+    @staticmethod
+    def login_user(
+        db: Session,
+        email: str,
+        password: str,
+    ):
+
+        user = (
+            db.query(User)
+            .filter(User.email == email)
+            .first()
+        )
+
+        if not user:
+            raise InvalidCredentialsError()
+
+        if not verify_password(
+            password,
+            user.hashed_password,
+        ):
+            raise InvalidCredentialsError()
+
+        access_token = create_access_token(
+            {
+                "sub": user.email,
+            }
+        )
+
+        return Token(
+            access_token=access_token,
+            token_type="bearer",
+        )
