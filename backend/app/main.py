@@ -4,6 +4,7 @@ from app.config.settings import settings
 from app.routers.health import router as health_router
 from app.database.database import Base, engine
 import app.models
+from app.routers.auth import router as auth_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -23,3 +24,4 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 app.include_router(health_router)
+app.include_router(auth_router)
