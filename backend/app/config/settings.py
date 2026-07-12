@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     FRONTEND_URL: str
     BACKEND_URL: str
+    DATABASE_URL: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
