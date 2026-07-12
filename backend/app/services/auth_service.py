@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.config.security import hash_password
 from app.models.user import User
 from app.schemas.user import UserCreate
+from app.exceptions.auth import EmailAlreadyExistsError
 
 
 class AuthService:
@@ -20,9 +21,7 @@ class AuthService:
         )
 
         if existing_user:
-            raise ValueError(
-                "Email already registered."
-            )
+            raise EmailAlreadyExistsError()
 
         db_user = User(
             full_name=user.full_name,
