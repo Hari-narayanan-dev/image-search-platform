@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Image Search Platform API"
     APP_VERSION: str = "2.0.0"
     API_PREFIX: str = "/api/v1"
+    prefix:str ="/auth"
 
     # ------------------------
     # Environment Variables

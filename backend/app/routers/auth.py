@@ -1,4 +1,5 @@
-from backend import app
+# from backend import app
+from app.config.settings import settings
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -6,9 +7,13 @@ from app.database.database import get_db
 from app.schemas.user import UserCreate, UserResponse
 from app.services.auth_service import AuthService
 from app.exceptions.auth import EmailAlreadyExistsError
+from app.schemas.auth import (
+    LoginRequest,
+    Token,
+)
 
 router = APIRouter(
-    prefix="/api/v1/auth",
+    prefix=settings.prefix,
     tags=["Authentication"],
 )
 
@@ -23,13 +28,22 @@ def signup(
     db: Session = Depends(get_db),
 ):
 
-    try:
-        return AuthService.register_user(
-            db=db,
-            user=user,
-        )
-    except EmailAlreadyExistsError as e:
-        raise HTTPException(
-            status_code=400,
-            detail=str(e)
-        )
+    return AuthService.register_user(
+        db=db,
+        user=user,
+    )
+
+@router.post(
+    "/login",
+    response_model=Token,
+)
+def login(
+    credentials: LoginRequest,
+    db: Session = Depends(get_db),
+):
+
+    return AuthService.login_user(
+        db=db,
+        email=credentials.email,
+        password=credentials.password,
+    )
